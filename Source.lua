@@ -1,55 +1,40 @@
 --[[
-    ██╗   ██╗ ██████╗ ██╗██████╗     ██╗   ██╗██╗
-    ██║   ██║██╔═══██╗██║██╔══██╗    ██║   ██║██║
-    ██║   ██║██║   ██║██║██║  ██║    ██║   ██║██║
-    ╚██╗ ██╔╝██║   ██║██║██║  ██║    ██║   ██║██║
-     ╚████╔╝ ╚██████╔╝██║██████╔╝    ╚██████╔╝██║
-      ╚═══╝   ╚═════╝ ╚═╝╚═════╝      ╚═════╝ ╚═╝
-
-    Void-UI  •  v1.2
-    Modern UI Library for Roblox Executors
-    Style: Haci (compact, minimal, no shadows)
+    Void-UI v1.3 — Fixed button visibility
+    Style: Haci
     Author: Alex
 ]]
 
 local VoidUI = {}
 VoidUI.__index = VoidUI
 
--- ============================================
--- SERVICES
--- ============================================
+-- Services
 local Players          = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService     = game:GetService("TweenService")
-local RunService       = game:GetService("RunService")
 local CoreGui          = game:GetService("CoreGui")
 local LocalPlayer      = Players.LocalPlayer
 
--- ============================================
--- THEME (Haci style)
--- ============================================
+-- Theme
 VoidUI.Theme = {
-    Background    = Color3.fromRGB(18, 18, 24),
-    BackgroundTr  = 0.10,
-    Panel         = Color3.fromRGB(24, 24, 32),
-    PanelTr       = 0.05,
-    Secondary     = Color3.fromRGB(32, 32, 42),
-    SecondaryTr   = 0.15,
-    Accent        = Color3.fromRGB(140, 82, 255),
-    AccentHover   = Color3.fromRGB(160, 110, 255),
-    Text          = Color3.fromRGB(235, 235, 245),
-    SubText       = Color3.fromRGB(140, 140, 160),
-    Stroke        = Color3.fromRGB(40, 40, 52),
-    StrokeTr      = 0.6,
-    Danger        = Color3.fromRGB(230, 70, 70),
+    Background   = Color3.fromRGB(18, 18, 24),
+    BackgroundTr = 0.10,
+    Panel        = Color3.fromRGB(24, 24, 32),
+    PanelTr      = 0.05,
+    Secondary    = Color3.fromRGB(32, 32, 42),
+    SecondaryTr  = 0.15,
+    Accent       = Color3.fromRGB(140, 82, 255),
+    AccentHover  = Color3.fromRGB(160, 110, 255),
+    Text         = Color3.fromRGB(235, 235, 245),
+    SubText      = Color3.fromRGB(140, 140, 160),
+    Stroke       = Color3.fromRGB(40, 40, 52),
+    StrokeTr     = 0.6,
+    Danger       = Color3.fromRGB(230, 70, 70),
 }
 
-VoidUI.Version = "1.2"
+VoidUI.Version = "1.3"
 VoidUI.Name    = "Void-UI"
 
--- ============================================
--- INTERNAL UTILITIES
--- ============================================
+-- Utilities
 local function create(className, props)
     local inst = Instance.new(className)
     for k, v in pairs(props or {}) do inst[k] = v end
@@ -84,14 +69,14 @@ local function padding(parent, t, r, b, l)
 end
 
 -- ============================================
--- MAIN WINDOW
+-- WINDOW
 -- ============================================
 function VoidUI:CreateWindow(config)
     config = config or {}
     local self = setmetatable({}, VoidUI)
 
     self.Name       = config.Name or "Void-UI"
-    self.Subtitle   = config.Subtitle or "v1.2"
+    self.Subtitle   = config.Subtitle or "v1.3"
     self.ToggleKey  = config.ToggleKey or Enum.KeyCode.RightShift
     self.Tabs       = {}
     self.Flags      = {}
@@ -103,13 +88,10 @@ function VoidUI:CreateWindow(config)
         ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
         IgnoreGuiInset = true,
     })
-
     local ok = pcall(function() self.ScreenGui.Parent = CoreGui end)
-    if not ok then
-        self.ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-    end
+    if not ok then self.ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
 
-    -- Main frame (compact Haci style)
+    -- Main
     self.Main = create("Frame", {
         Name = "Main",
         Size = UDim2.new(0, 420, 0, 260),
@@ -123,9 +105,8 @@ function VoidUI:CreateWindow(config)
     corner(self.Main, 8)
     stroke(self.Main, self.Theme.Stroke, 1, self.Theme.StrokeTr)
 
-    -- Header (slim)
+    -- Header
     self.Header = create("Frame", {
-        Name = "Header",
         Size = UDim2.new(1, 0, 0, 28),
         BackgroundColor3 = self.Theme.Panel,
         BackgroundTransparency = self.Theme.PanelTr,
@@ -143,7 +124,6 @@ function VoidUI:CreateWindow(config)
     })
     headerFix.Parent = self.Header
 
-    -- Accent line at bottom of header
     local accentLine = create("Frame", {
         Size = UDim2.new(1, -20, 0, 1),
         Position = UDim2.new(0, 10, 1, -1),
@@ -153,7 +133,6 @@ function VoidUI:CreateWindow(config)
     })
     accentLine.Parent = self.Header
 
-    -- Logo
     local logo = create("TextLabel", {
         Size = UDim2.new(1, -120, 1, 0),
         Position = UDim2.new(0, 12, 0, 0),
@@ -166,7 +145,6 @@ function VoidUI:CreateWindow(config)
     })
     logo.Parent = self.Header
 
-    -- Subtitle
     local subtitle = create("TextLabel", {
         Size = UDim2.new(0, 80, 1, 0),
         Position = UDim2.new(1, -120, 0, 0),
@@ -179,7 +157,6 @@ function VoidUI:CreateWindow(config)
     })
     subtitle.Parent = self.Header
 
-    -- Minimize button
     local minBtn = create("TextButton", {
         Size = UDim2.new(0, 18, 0, 18),
         Position = UDim2.new(1, -46, 0.5, -9),
@@ -195,7 +172,6 @@ function VoidUI:CreateWindow(config)
     minBtn.Parent = self.Header
     corner(minBtn, 4)
 
-    -- Close button
     local closeBtn = create("TextButton", {
         Size = UDim2.new(0, 18, 0, 18),
         Position = UDim2.new(1, -24, 0.5, -9),
@@ -211,22 +187,8 @@ function VoidUI:CreateWindow(config)
     closeBtn.Parent = self.Header
     corner(closeBtn, 4)
 
-    minBtn.MouseEnter:Connect(function()
-        TweenService:Create(minBtn, TweenInfo.new(0.15), { BackgroundTransparency = 0.2 }):Play()
-    end)
-    minBtn.MouseLeave:Connect(function()
-        TweenService:Create(minBtn, TweenInfo.new(0.15), { BackgroundTransparency = 0.5 }):Play()
-    end)
-    closeBtn.MouseEnter:Connect(function()
-        TweenService:Create(closeBtn, TweenInfo.new(0.15), { BackgroundTransparency = 0 }):Play()
-    end)
-    closeBtn.MouseLeave:Connect(function()
-        TweenService:Create(closeBtn, TweenInfo.new(0.15), { BackgroundTransparency = 0.3 }):Play()
-    end)
-
-    -- Sidebar
+    -- Sidebar (sin UIListLayout problemático)
     self.Sidebar = create("Frame", {
-        Name = "Sidebar",
         Size = UDim2.new(0, 100, 1, -28),
         Position = UDim2.new(0, 0, 0, 28),
         BackgroundColor3 = self.Theme.Panel,
@@ -235,7 +197,9 @@ function VoidUI:CreateWindow(config)
     })
     self.Sidebar.Parent = self.Main
     padding(self.Sidebar, 6, 5, 6, 5)
-    create("UIListLayout", {
+
+    -- Lista interna que SÍ maneja bien los frames
+    self.SidebarList = create("UIListLayout", {
         Padding = UDim.new(0, 3),
         SortOrder = Enum.SortOrder.LayoutOrder,
         Parent = self.Sidebar,
@@ -243,7 +207,6 @@ function VoidUI:CreateWindow(config)
 
     -- Page container
     self.PageContainer = create("Frame", {
-        Name = "Pages",
         Size = UDim2.new(1, -100, 1, -28),
         Position = UDim2.new(0, 100, 0, 28),
         BackgroundTransparency = 1,
@@ -314,16 +277,11 @@ function VoidUI:CreateWindow(config)
 end
 
 -- ============================================
--- CREATE TAB (Haci style — with left accent bar)
+-- TAB
 -- ============================================
 function VoidUI:CreateTab(tabName)
-    local tab = {
-        Name = tabName or "Tab",
-        Library = self,
-    }
-    setmetatable(tab, { __index = VoidUI })
+    tabName = tabName or "Tab"
 
-    -- Container for tab button (allows accent bar on left)
     local holder = create("Frame", {
         Size = UDim2.new(1, 0, 0, 24),
         BackgroundColor3 = self.Theme.Background,
@@ -333,7 +291,6 @@ function VoidUI:CreateTab(tabName)
     holder.Parent = self.Sidebar
     corner(holder, 4)
 
-    -- Left accent bar (hidden by default)
     local accentBar = create("Frame", {
         Size = UDim2.new(0, 2, 0.6, 0),
         Position = UDim2.new(0, 0, 0.2, 0),
@@ -345,7 +302,6 @@ function VoidUI:CreateTab(tabName)
     corner(accentBar, 2)
 
     local btn = create("TextButton", {
-        Name = tabName,
         Size = UDim2.new(1, -6, 1, 0),
         Position = UDim2.new(0, 6, 0, 0),
         BackgroundTransparency = 1,
@@ -359,9 +315,7 @@ function VoidUI:CreateTab(tabName)
     })
     btn.Parent = holder
 
-    -- Page
     local page = create("ScrollingFrame", {
-        Name = tabName .. "Page",
         Size = UDim2.new(1, 0, 1, 0),
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
@@ -382,21 +336,24 @@ function VoidUI:CreateTab(tabName)
         page.CanvasSize = UDim2.new(0, 0, 0, list.AbsoluteContentSize.Y + 20)
     end)
 
+    local tab = {
+        Name = tabName,
+        Page = page,
+        Button = btn,
+        Holder = holder,
+        AccentBar = accentBar,
+        Library = self,
+    }
+
     local function select()
-        for _, child in pairs(self.PageContainer:GetChildren()) do
-            if child:IsA("ScrollingFrame") then child.Visible = false end
-        end
-        for _, child in pairs(self.Sidebar:GetChildren()) do
-            if child:IsA("Frame") then
-                local fBtn = child:FindFirstChildWhichIsA("TextButton")
-                local fBar = child:FindFirstChildWhichIsA("Frame")
-                if fBtn then fBtn.TextColor3 = self.Theme.SubText end
-                if fBar then fBar.Visible = false end
-                TweenService:Create(child, TweenInfo.new(0.15), {
-                    BackgroundColor3 = self.Theme.Background,
-                    BackgroundTransparency = 0.5,
-                }):Play()
-            end
+        for _, t in ipairs(self.Tabs) do
+            t.Page.Visible = false
+            t.AccentBar.Visible = false
+            t.Button.TextColor3 = self.Theme.SubText
+            TweenService:Create(t.Holder, TweenInfo.new(0.15), {
+                BackgroundColor3 = self.Theme.Background,
+                BackgroundTransparency = 0.5,
+            }):Play()
         end
         page.Visible = true
         btn.TextColor3 = self.Theme.Text
@@ -407,7 +364,16 @@ function VoidUI:CreateTab(tabName)
         }):Play()
     end
 
+    tab.Select = select
+
     btn.MouseButton1Click:Connect(select)
+    holder.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+            select()
+        end
+    end)
+
     holder.MouseEnter:Connect(function()
         if not page.Visible then
             TweenService:Create(holder, TweenInfo.new(0.15), {
@@ -425,14 +391,10 @@ function VoidUI:CreateTab(tabName)
         end
     end)
 
-    if #self.Tabs == 0 then select() end
     table.insert(self.Tabs, tab)
+    setmetatable(tab, { __index = VoidUI })
 
-    tab.Page = page
-    tab.Button = btn
-    tab.Holder = holder
-    tab.AccentBar = accentBar
-    tab.Select = select
+    if #self.Tabs == 1 then select() end
 
     return tab
 end
@@ -458,16 +420,6 @@ function VoidUI:CreateSection(tab, text)
         TextXAlignment = Enum.TextXAlignment.Left,
     })
     label.Parent = frame
-
-    local line = create("Frame", {
-        Size = UDim2.new(1, -70, 0, 1),
-        Position = UDim2.new(0, 70, 0.5, 0),
-        BackgroundColor3 = self.Theme.Stroke,
-        BackgroundTransparency = 0.6,
-        BorderSizePixel = 0,
-    })
-    line.Parent = frame
-    return frame
 end
 
 function VoidUI:CreateToggle(tab, config)
@@ -533,7 +485,6 @@ function VoidUI:CreateToggle(tab, config)
 
     frame.MouseButton1Click:Connect(function() setState(not state) end)
     if flag then self.Flags[flag] = state end
-
     return { Set = setState, Get = function() return state end }
 end
 
@@ -654,10 +605,8 @@ function VoidUI:CreateSlider(tab, config)
         Set = function(v)
             v = math.clamp(v, min, max)
             value = v
-            local rel = (v - min) / (max - min)
-            fill.Size = UDim2.new(rel, 0, 1, 0)
+            fill.Size = UDim2.new((v - min) / (max - min), 0, 1, 0)
             label.Text = (config.Name or "Slider") .. ": " .. v
-            if flag then self.Flags[flag] = v end
         end,
         Get = function() return value end,
     }
@@ -680,7 +629,6 @@ function VoidUI:CreateTextBox(tab, config)
     })
     box.Parent = tab.Page
     corner(box, 5)
-
     box.FocusLost:Connect(function()
         if config.Callback then task.spawn(config.Callback, box.Text) end
     end)
@@ -691,7 +639,6 @@ function VoidUI:CreateDropdown(tab, config)
     config = config or {}
     local options = config.Options or {}
     local selected = config.Default or (options[1] or "")
-    local open = false
     local flag = config.Flag
 
     local container = create("Frame", {
@@ -699,7 +646,6 @@ function VoidUI:CreateDropdown(tab, config)
         BackgroundColor3 = self.Theme.Secondary,
         BackgroundTransparency = self.Theme.SecondaryTr,
         BorderSizePixel = 0,
-        ClipsDescendants = false,
     })
     container.Parent = tab.Page
     corner(container, 5)
@@ -749,19 +695,13 @@ function VoidUI:CreateDropdown(tab, config)
     panel.Parent = container
     corner(panel, 5)
     stroke(panel, self.Theme.Stroke, 1, 0.5)
+
     local list = create("UIListLayout", {
         Padding = UDim.new(0, 2),
         SortOrder = Enum.SortOrder.LayoutOrder,
         Parent = panel,
     })
     padding(panel, 3, 3, 3, 3)
-
-    local function selectOption(opt)
-        selected = opt
-        if flag then self.Flags[flag] = opt end
-        label.Text = (config.Name and config.Name .. ": " or "") .. opt
-        if config.Callback then task.spawn(config.Callback, opt) end
-    end
 
     for _, opt in ipairs(options) do
         local optBtn = create("TextButton", {
@@ -777,21 +717,11 @@ function VoidUI:CreateDropdown(tab, config)
         })
         optBtn.Parent = panel
         corner(optBtn, 3)
-        optBtn.MouseEnter:Connect(function()
-            TweenService:Create(optBtn, TweenInfo.new(0.1), {
-                BackgroundColor3 = self.Theme.Accent,
-                BackgroundTransparency = 0.1,
-            }):Play()
-        end)
-        optBtn.MouseLeave:Connect(function()
-            TweenService:Create(optBtn, TweenInfo.new(0.1), {
-                BackgroundColor3 = self.Theme.Secondary,
-                BackgroundTransparency = 0.3,
-            }):Play()
-        end)
         optBtn.MouseButton1Click:Connect(function()
-            selectOption(opt)
-            open = false
+            selected = opt
+            if flag then self.Flags[flag] = opt end
+            label.Text = (config.Name and config.Name .. ": " or "") .. opt
+            if config.Callback then task.spawn(config.Callback, opt) end
             panel.Visible = false
             TweenService:Create(container, TweenInfo.new(0.15), {
                 Size = UDim2.new(1, 0, 0, 26)
@@ -804,7 +734,7 @@ function VoidUI:CreateDropdown(tab, config)
     end)
 
     btn.MouseButton1Click:Connect(function()
-        open = not open
+        local open = not panel.Visible
         panel.Visible = open
         if open then
             local h = math.min(#options * 24 + 8, 120)
@@ -822,7 +752,10 @@ function VoidUI:CreateDropdown(tab, config)
 
     if flag then self.Flags[flag] = selected end
     return {
-        Set = function(v) selectOption(v) end,
+        Set = function(v)
+            selected = v
+            label.Text = (config.Name and config.Name .. ": " or "") .. v
+        end,
         Get = function() return selected end,
     }
 end
@@ -896,7 +829,6 @@ function VoidUI:CreateKeybind(tab, config)
         Set = function(k)
             currentKey = k
             keyBtn.Text = k.Name
-            if flag then self.Flags[flag] = k end
         end,
         Get = function() return currentKey end,
     }
@@ -914,11 +846,10 @@ function VoidUI:CreateLabel(tab, text)
         TextWrapped = true,
     })
     label.Parent = tab.Page
-    return label
 end
 
 -- ============================================
--- NOTIFICATIONS (Haci style)
+-- NOTIFICATIONS
 -- ============================================
 VoidUI.NotifyIndex = 0
 
@@ -928,7 +859,6 @@ function VoidUI:Notify(config)
     local idx = VoidUI.NotifyIndex
 
     local notif = create("Frame", {
-        Name = "Notify" .. idx,
         Size = UDim2.new(0, 210, 0, 46),
         Position = UDim2.new(1, 20, 0, 40 + (idx - 1) * 54),
         BackgroundColor3 = self.Theme.Panel,
@@ -971,7 +901,7 @@ function VoidUI:Notify(config)
     })
     text.Parent = notif
 
-    TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {
+    TweenService:Create(notif, TweenInfo.new(0.3), {
         Position = UDim2.new(1, -230, 0, 40 + (idx - 1) * 54)
     }):Play()
 
@@ -983,50 +913,6 @@ function VoidUI:Notify(config)
         notif:Destroy()
         VoidUI.NotifyIndex = math.max(0, VoidUI.NotifyIndex - 1)
     end)
-end
-
--- ============================================
--- CONFIG SAVE / LOAD
--- ============================================
-function VoidUI:SaveConfig(filename)
-    if not writefile then
-        self:Notify({ Title = "Error", Text = "writefile not available" })
-        return
-    end
-    filename = filename or "VoidUI_Config.json"
-    local data = {}
-    for k, v in pairs(self.Flags) do
-        if typeof(v) == "EnumItem" then
-            data[k] = { __type = "EnumItem", value = v.Name }
-        else
-            data[k] = v
-        end
-    end
-    writefile(filename, game:GetService("HttpService"):JSONEncode(data))
-    self:Notify({ Title = "Config", Text = "Saved to " .. filename })
-end
-
-function VoidUI:LoadConfig(filename)
-    if not (isfile and readfile) then
-        self:Notify({ Title = "Error", Text = "readfile not available" })
-        return
-    end
-    filename = filename or "VoidUI_Config.json"
-    if not isfile(filename) then
-        self:Notify({ Title = "Error", Text = "File not found" })
-        return
-    end
-    local ok, data = pcall(function()
-        return game:GetService("HttpService"):JSONDecode(readfile(filename))
-    end)
-    if not ok then
-        self:Notify({ Title = "Error", Text = "Invalid config" })
-        return
-    end
-    for k, v in pairs(data) do
-        self.Flags[k] = v
-    end
-    self:Notify({ Title = "Config", Text = "Loaded from " .. filename })
 end
 
 -- ============================================
